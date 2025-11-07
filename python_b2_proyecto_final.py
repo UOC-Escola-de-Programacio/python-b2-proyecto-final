@@ -1197,7 +1197,7 @@ Es crucial comprender que el tratamiento de datos no es solo una etapa prelimina
 
 Hasta este punto, hemos completado varios pasos relacionados con el tratamiento y la limpieza de datos. Ahora vamos a continuar con el desarrollo de los diferentes algoritmos de Machine Learning.
 
-*Exporta el DataFrame data_frame_label a un archivo CSV sin incluir el índice*
+*Exporta el DataFrame data_frame_tipo_financiamiento a un archivo CSV sin incluir el índice*
 """
 
 # Write you code here
