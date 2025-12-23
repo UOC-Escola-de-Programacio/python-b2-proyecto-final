@@ -10,10 +10,10 @@ Original file is located at
 
 ## **Información del estudiante**
 ---
-* **Título**:
-* **Autor**:
-* **Correo**:
-* **Fecha**:
+* **Título**: Clasificación de Tipos de Financiamiento en un Entorno Open Finance mediante Modelos de Machine Learning
+* **Autor**: Joaquin Ureta Saenz Peña
+* **Correo**: juretasaenzpena2@uoc.edu
+* **Fecha**: 23/12/2025
 * **Salida**: ipynb, predicciones.csv
 ---
 
@@ -51,8 +51,21 @@ Para elaborar una solución que consolide las bases de datos de estas institucio
 - **Optimización del modelo:** Ajustar hiperparámetros y realizar selección de características para optimizar el rendimiento de los modelos.
 
 ## **Solución**:
+El presente proyecto aborda un problema de clasificacion multiclase en el contexto de Open Finance, cuyo objetivo es predecir el tipo de financiamiento asociado a un cliente (casa, carro, ambos o ninguno), a partir de la integracion de datos provenientes de distintas instituciones financieras.
+
+La solucion desarrollada contempla un proceso completo de ingenieria de datos y ciencia de datos, comenzando por la integracion y limpieza de multiples fuentes de informacion, seguido por un analisis exploratorio detallado, la creacion de nuevas variables, el tratamiento de valores tipicos y desbalance de clases,
+y finalmente la construccion y evaluacion de distintos modelos de Machine Learning.
+
+Se implementaron pipelines de preprocesamiento que permiten asegurar consistencia, reproducibilidad y escalabilidad del flujo de datos, dejando el conjunto final preparado para ser utilizado en modelos predictivos de forma eficiente.
 
 ## **Entorno**:
+El desarrollo se realizo en un entorno Python, con las siguientes librerias principales:
+- pandas, numpy
+- matplotlib, seaborn
+- scikit-learn
+- imbalanced-learn
+
+El uso de pipelines y transformadores personalizados permitió mantener una estructura clara y modular, alineada con buenas prácticas de ciencia de datos.
 
 ## **Origen de la fuente de datos**:
 
@@ -467,9 +480,22 @@ La preparación de datos es un paso crucial en el proceso de análisis de datos.
 ##Recopilar Información
 ## Preguntas
 * *¿Cuáles son los desafíos clave al integrar y analizar datos de diferentes instituciones financieras para desarrollar sistemas de recomendación de seguros?*
+El principal desafio es la heterogeneidad de los datos: cada institucion suele estructurar y nombrar atributos de manera distinta, con formatos, escalas y nomenclaturas variables. Además, surgen temas de duplicidad, datos faltantes y falta de normalizacion que afectan la calidad del dataaset integrado. También existe complejidad semántica: columnas como ingresos, productos o tipos de financiamiento 
+pueden representar conceptos similares per medidos con diferentes criterios.
+Finalmente, surgen desafíos eticos y regulatorios vinculados a privacidad, consentimiento y manejo seguro de informacion financiera sensible, que obligan a implementar controles estrictos durante la integracion y análisis.
+
 * *¿De qué manera podría su participación en el desarrollo de nuevas fuentes de información de seguros en el marco de Open Finance promover la transparencia y autonomía de los usuarios del sistema financiero?*
+Open Financie democratiza el acceso a la informacion y evita que los datos estén aislados en un único banco o aseguradora, permitiendo compara alternativas objetivamente. Esta apertura fomenta transparencia al mostrar costos, coberturas y riesgos de manera más clara, ademas de impulsar la competencia y obligar a las institutciones a mejorar precios y servicios.
+El usuario gana autonomía porque puedde gestionar sus datos, elegir quién accede a ellos y recibir recomendaciones personalizadas basadas en su perfil real, lo que favorece decisiones informadas.
+
 * *¿Cuál es la similitud entre Open Finance y otras fuentes de datos financieros abiertos, como Open Banking y Open Insurance, y cómo benefician a los usuarios del sistema financiero en términos de transparencia y acceso a información?*
+Los tres modelos comparten un onjetivo común: permitir el intercambio seguro y estandarizado de datos entre entidades financieras bajo consentimiento del usuario. Open Banking se enforca en cuentas y trasacciones, Open Insurance en pólizas y riesgos, y Open Finance integra ambos junto con inversiones y fondos.
+Todos benefician al usuario mediante mayor transparencia, competencia, portabilidad de informacion, mejores ofertas personalizadas y la posibilidad de contratar productos financieros o de seguros sin depender de una sola institucion.
+
 * *¿Qué aspectos clave deberías revisar al explorar los datos de GFT Open Finance para entender su contenido, formato y posibles problemas, y cómo estos podrían afectar el desarrollo de modelos de machine learning para recomendaciones de seguros?*
+Es fundamental revisar valores faltantes, duplicados, outlierrs, formatos inconsistentes, distribucion de variables categoricas y metricas como edad o ingresos. Tambien es clave identificar relaciones entre columnas y posibles desbalances entre clases. Problemas en estas areas impactan directamente
+la calidad del modelo: valores nulos sesgan estimaciones, desbalance afecta precision, outliers distorcionan escalas y formatoss inconsistentes provocan errores en codificacion. Una expliracion rigurosa permite definir limpieza, normalizacion y transformaciones adecuadas, mejorando la capacidad predictiva del modelo final.
+
 
 ## Exploración Inicial
 
@@ -477,34 +503,47 @@ Comencemos importando los diferentes conjuntos de datos como dataframes utilizan
 """
 
 #Write your code here
-df_retailbank = pd.read_csv("change_path_to_RetailBankEFG")
+df_retailbank = pd.read_csv("data/RetailBankEFG.csv")
+df_retailbank.head(10)
 
 """*Realiza la misma acción para InvestmentBankCDE.csv.*"""
 
 #Write your code here
-df_investment = pd.read_csv("change_path_to_InvestmentBankCDE")
+df_investment = pd.read_csv("data/InvestmentBankCDE.csv")
+df_investment.head(10)
 
 """*Realiza la misma acción para InvestmentBankCDE.csv.*"""
 
 #Write your code here
-df_insurance = pd.read_csv("change_path_to_InsuranceCompanyABC")
+df_insurance = pd.read_csv("data//InsuranceCompanyABC.csv")
+df_insurance.head(10)
 
 """## Pregunta
 *¿Puedes identificar un atributo común entre los diferentes conjuntos de datos que permita juntarlos?*
+
+El atributo común para hacer el merge es ID, que identifica al cliente en las tres instituciones
+
 """
 
 #Write your code here
+common_key =set(df_retailbank.columns) & set(df_investment.columns) & set(df_insurance.columns)
+print("Atributo(s) común(es):", common_key)
 
 """## Pregunta
 Indica cuál es la cantidad de registros en cada conjunto de datos.
 
 *¿Qué conclusiones puedes sacar luego de observar los resultados?*
+
 """
 
 #Write your code here
+print("Registros RetailBankEFG:", df_retailbank.shape[0])
+print("Registros InvestmentBankCDE:", df_investment.shape[0])
+print("Registros InsuranceCompanyABC:", df_insurance.shape[0])
 
 """## Pregunta
 ¿Has notado algún patrón entre los datos, ya sea entre filas o columnas?
+Los tres tienen el mismo número (10.082), lo que sugierer que se trata del mismo universo de clientes visto desde distintas instituciones, lo que facilita el cruce y analisis conjunto.
 
 # Evaluación de Calidad de Datos
 
@@ -523,13 +562,20 @@ def get_nan_values(data_frame):
 """*Imprime los valores faltantes por fila y columna*"""
 
 #Write your code here for df_retailbank
+print("NaN en df_retailbank:")
+print(get_nan_values(df_retailbank))
 
 #Write your code here for df_investment
+print("NaN en df_investment:")
+print(get_nan_values(df_investment))
 
 #Write your code here for df_insurance
+print("NaN en df_insurance:")
+print(get_nan_values(df_insurance))
 
 """## Pregunta
 *¿Existen valores faltantes en los datos?*
+No. A partir de la funcion get_nan_values, se observa que en los tres conjuntos de datos, el conteo de valores NaN por columna es 0 y el numero total de registros con al menos un NaN tambien es 0. Por lo tanato, en esta version de los datos no es necesario aplicar tecnicas de imputaicon para valores faltantes.
 
 ## Duplicados
 Vamos a detectar si existen filas duplicadas que pueden distorsionar los análisis. Para ello, vamos a validar si hay registros duplicados en el conjunto de datos utilizando la función `check_duplicates`. En caso afirmativo, necesitaremos pasar como parámetros el dataframe a validar y la columna que se utiliza como identificador.
@@ -557,9 +603,17 @@ def check_duplicates(data_frame, column):
 """*Imprime la cantidad de filas duplicadas para df_retailbank, df_investment y df_insurance*"""
 
 #Write your code here
+print("Duplicados en df_retailbank (por ID):", check_duplicates(df_retailbank, "ID"))
+print("Duplicados en df_investment (por ID):", check_duplicates(df_investment, "ID"))
+print("Duplicados en df_insurance (por ID):", check_duplicates(df_insurance, "ID"))
 
 """## Pregunta
 ¿Existen datos duplicados?
+La salida de check_duplicates(ddf_*,"ID") dice lo siguiente:
+-Duplicados en df_retailbank (por ID): 552
+-Duplicados en df_investment (por ID):552
+- Duplicaods en df_insurance (por ID):552
+Por lo que se identifican 552 resgistros duplicados, lo que indica que hay clientes repetidos en los tres conjuntos de datos, por lo que es necesario eliminar duplicados (como ser un drop_duplicates sobre ID) para evitar que estos registros distorcionen los analisis y el entrenamiento de los modelos.
 
 ## Inconsistencias
 En esta sección, se propondrán varios métodos para identificar inconsistencias en los datos. Primero, vamos a revisar las estadísticas básicas. Para ello, utilizaremos la función `describe()`.
@@ -568,10 +622,13 @@ En esta sección, se propondrán varios métodos para identificar inconsistencia
 """
 
 #Write your code here for df_retailbank
+df_retailbank.describe()
 
 #Write your code here for df_investment
+df_investment.describe()
 
 #Write your code here for df_insurance
+df_insurance.describe()
 
 """### Identificar Valores Únicos:
 Ahora, para todas las variables no numéricas, debemos identificar cuántos tipos de datos están registrados en cada columna. Implementaremos la función `get_value_counts_non_numeric_columns`, la cual obtiene los conteos de valores de las columnas no numéricas en un DataFrame y devuelve un diccionario donde las claves son los nombres de las columnas no numéricas y los valores son sus respectivos conteos de valores.
@@ -601,34 +658,60 @@ def get_value_counts_non_numeric_columns(df):
     Returns:
     dict: A dictionary where keys are non-numeric column names and values are their respective value counts.
     """
-    # write your code here
-    #Get non-numeric columns
-    #pass
+    non_numeric_cols = find_non_numeric_columns(df)
+    value_counts_dict = {}
+    for col in non_numeric_cols:
+        value_counts_dict[col] = df[col].value_counts()
+    return value_counts_dict
 
 """*Imprime los conteos de las columnas no numéricas.*"""
 
 #Write your code here for df_retailbank
 get_value_counts_non_numeric_columns(df_retailbank)
+print("Valores no numéricos df_retailbank:")
+vc_rb = get_value_counts_non_numeric_columns(df_retailbank)
+for col, vc in vc_rb.items():
+    print(f"\nColumna: {col}")
+    print(vc)
 
 #Write your code here for df_investment
 get_value_counts_non_numeric_columns(df_investment)
+print("Valores no numéricos df_investment:")
+vc_inv = get_value_counts_non_numeric_columns(df_investment)
+for col, vc in vc_inv.items():
+    print(f"\nColumna: {col}")
+    print(vc)
 
 #Write your code here for df_insurance
 get_value_counts_non_numeric_columns(df_insurance)
+print("Valores no numéricos df_insurance:")
+vc_ins = get_value_counts_non_numeric_columns(df_insurance)
+for col, vc in vc_ins.items():
+    print(f"\nColumna: {col}")
+    print(vc)
 
 """### Verificar Tipos de Datos:
 *Utiliza el atributo `dtypes` para verificar los tipos de datos de cada columna.*
 """
 
 #Write your code here for df_retailbank
+df_retailbank.dtypes
 
 #Write your code here for df_investment
+df_investment.dtypes
 
 #Write your code here for df_insurance
+df_insurance.dtypes
+
 
 """## Pregunta
 *¿Qué puedes concluir respecto de todas las variables que no son numéricas?*
+Las variables no numericas en los conjuntos de datos corresponden principalmente a caracteristicas categoricas, como region, genero y rangos definidos de edad e ingresos. Estas variables presentan un numero limitado y bien definido de categorias, lo que facilita su analisis y posterior transformacion mediante
+tecnicas de codificacion para su uso en modelos de machine learning.
+
 *¿Has identificado algún patrón o característica?*
+Se observa que algunas categorias tienen una mayor frecuencia que otras, lo que sugiere la existencia de posibles desbalances en los datos. Este comportamiento es relevante, ya que puede influir en el desempeño de los modelos de clasificacion, haciendo necesario aplicar tecnicas de balanceo o ajustes en las 
+metricas de evaluacion para evitar sesgos en las predicciones.
 
 ## Visualización General de los datos y Analizar Patrones Anómalos
 Esta es una sección libre en la que podrás crear diferentes visualizaciones de los datos. Sugiero que utilices principalmente visualizaciones para validar la cantidad de datos de las variables no numéricas. Además, debes realizar gráficas tipo box plot para las columnas numéricas, exceptuando la columna ID.
@@ -643,15 +726,102 @@ Esta es una sección libre en la que podrás crear diferentes visualizaciones de
 """
 
 #Write your code here, add your custom plots for df_retailbank
+#--- VARIABLES NO NUMERICAS : GRAFICO DE BARRAS
+non_numeric_rb = find_non_numeric_columns(df_retailbank)
+
+#si hay muchas columnas, tomo unas cuantas mas relevantes ( o las primeras)
+print("Columnas no numericas df_retailbank:",non_numeric_rb)
+
+#Grafico de barras de las variables no numericas
+for col in non_numeric_rb:
+    plt.figure(figsize=(8,4))
+    sns.countplot(x=col,data=df_retailbank)
+    plt.title(f"Distribucion de {col} en df_retailbank")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+# --- Boxplots para columnas numéricas (excluyendo ID) ---
+numeric_rb = df_retailbank.select_dtypes(include='number').columns.tolist()
+if "ID" in numeric_rb:
+    numeric_rb.remove("ID")
+
+plt.figure(figsize=(10,4))
+sns.boxplot(data=df_retailbank[numeric_rb])
+plt.title("Boxplots columnas numéricas df_retailbank (sin ID)")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
 
 #Write your code here, add your custom plots for df_investment
 
+# --- Variables no numéricas: gráficos de barras ---
+non_numeric_inv = find_non_numeric_columns(df_investment)
+
+print("Columnas no numéricas df_investment:", non_numeric_inv)
+
+for col in non_numeric_inv:
+    plt.figure(figsize=(8,4))
+    sns.countplot(x=col, data=df_investment)
+    plt.title(f"Distribución de {col} en df_investment")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+# --- Boxplots para columnas numéricas (excluyendo ID) ---
+numeric_inv = df_investment.select_dtypes(include='number').columns.tolist()
+if "ID" in numeric_inv:
+    numeric_inv.remove("ID")
+
+plt.figure(figsize=(10,4))
+sns.boxplot(data=df_investment[numeric_inv])
+plt.title("Boxplots columnas numéricas df_investment (sin ID)")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
 #Write your code here, add your custom plots for df_insurance
+# --- Variables no numéricas: gráficos de barras ---
+non_numeric_ins = find_non_numeric_columns(df_insurance)
+
+print("Columnas no numéricas df_insurance:", non_numeric_ins)
+
+for col in non_numeric_ins:
+    plt.figure(figsize=(8,4))
+    sns.countplot(x=col, data=df_insurance)
+    plt.title(f"Distribución de {col} en df_insurance")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+# --- Boxplots para columnas numéricas (excluyendo ID) ---
+numeric_ins = df_insurance.select_dtypes(include='number').columns.tolist()
+if "ID" in numeric_ins:
+    numeric_ins.remove("ID")
+
+plt.figure(figsize=(10,4))
+sns.boxplot(data=df_insurance[numeric_ins])
+plt.title("Boxplots columnas numéricas df_insurance (sin ID)")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
 
 """## Preguntas
 1. *¿Cuál de las dos opciones sugieres utilizar para evaluar datos no numéricos: imprimir los valores o crear visualizaciones?*
+
+Para evaluar datos no numericos es mas util combinar ambas opciones, pero si tuviera que priorizar una, suferiría utilizar visualizaciones. Imprmir los valores permite ver el detalle exacto de los conteos, pero los graficos de barras o de pastel facilitan detectar patrones, categorias dominantes y posibles desbalances de forma rapida e intuitiva.
+Las visualizaciones ayudan a comunicar mejor los hallazgos y a tomar decisiones mas infromacdas sobre el preprocesamiento y el modelo posterior.
+
 2. *¿Qué otros tipos de visualizaciones se te ocurren que podrías sugerir? Justifica tu respuesta.*
+
+Ademas de los graficos de barras y de pastel, se puden utilizar mapas de calor (heatmaps) para visualizar matrices de correlacion entre variables numericas, histogramas para analizar la distribucion de una variable contreta y hasta graficos de dispersión para explorar relaciones entre pares de variables. 
+Estas visualizaciones permiten identificar patrones, relaciones no lineales, agrupaciones naturales y posibles outliers que influyen directamente en el rendimiento de los modelos de machine learning.
+
 3. *¿Existe un desbalance en los datos, es decir, existen más tipos que corresponden a una clase? ¿Cuál es la clase y cómo crees que esto puede afectar al construir modelos de machine learning?*
+
+A partir de los conteos de las variables categoricas, se observa que en varias de ellas existe una o mas categorias claramente mayoritarias, es decir, hay desbalance en la distribucion de clases. Cuando una clase tiene muchos mas registros que las demas, los modelos de machine learning tienden a 
+"aprender" esa clase dominante y pueden predecirla con mucha frecuencia, ignorando las minoritarias. Esto se traduce en una aparente buena accuracy global, pero en un mal desempeño en las clases menos representadas.
+Por ello, seria importante aplicar tecnicas de balanceo, ajustar metricas de evaluacion y si es necesario, adaptar los modelos para tratar adecuadamente el desbalance.
 
 ### Analizar Patrones Anómalos:
 Para realizar el análisis de patrones anómalos, utilizarás la función `plot_boxplot_violinplot`.
@@ -660,14 +830,33 @@ Para realizar el análisis de patrones anómalos, utilizarás la función `plot_
 """
 
 #Write your code here for df_insurance
+plot_boxplot_violinplot(
+    x="Regiao",
+    y="Idade",
+    data_frame=df_insurance
+)
 
 """ *Graficar la región(Regiao) en función de la edad(Renda), del conjunto de datos `df_insurance`.*"""
 
 #Write your code here for df_insurance
+plot_boxplot_violinplot(
+    x="Regiao",
+    y="Renda",
+    data_frame=df_insurance
+)
 
 """## Preguntas
 * *¿Cuál es la distribución de datos sugerida?*
+
+La distribucion de los datos sugiere una concentracion mayoritaria alrededor de los valores centrales, con una dispersion moderada dependiendo de la region. Tanto la edad como la renta muestran distribuciones asimetricas, lo que indica que no siguen estrictamente una distribucion normal.
+Existen diferencias entre regiones, lo que sugiere que la variable region influye en la distribucion de edad e ingresos de los clientes.
+
 * *¿Existen datos atípicos en el conjunto de datos?* *¿Cómo podrías corregir estos datos? Justifica tu respuesta*.
+
+Si, se observan datos atipicos tanto en la variable edad como en la variable renta, especialmente en los extremos superiories e inferiores de las distribuciones. Estos outliers pueden deberse a errores de registro,
+valores poco representativos o casos excepcionales. Para corregirlos, una opcion adecuada es aplicar metodos basados en el rango intercuartilico (IQR), eliminando o ajustando los valores que se encuentren por debajo del primer
+cuartil o por encima del tercer cuartil. Otra alternativa seria utilizar tecnicas de escalado robusto o modelos menos snesibles a outliers, dependiendo del impacto que tengan estos valores en el rendimiento del modelo de machine learnind.
+
 
 # **Pregunta 2 - Limpieza y tratamiento de Datos**
 
@@ -677,9 +866,25 @@ Para realizar el análisis de patrones anómalos, utilizarás la función `plot_
 
 ### Preguntas
 1. *¿Luego de la evaluación es necesario realizar alguna técnica para completar datos faltantes?*
+
+No, luego de la evaluacion inicial se observa que los conjuntos de datos no presentan valores faltantes significativos. Por lo tanto, no es estrictamente necesario aplicar tecnicas de completado o imputacion en esta etapa del analisis.
+
 2. *¿Debemos realizar tareas de imputación de valores luego de analizar los datos?*
+
+Dadp que no se detectaron valores nulos en las variables analizadas, no es necesario realizar tareas de imputacion. Sin embargo, es importante considerar tecnicas de imputacion en escenarios futuros donde se incorporen nuevas fuentes
+de datos o se detecten valores faltantes durante el proceso de integracion.
+
 3. *¿Por favor, describe al menos dos técnicas de imputación de datos para valores faltantes basadas en métodos estadísticos?*
+
+Dos tecnicas comunes de imputacion basadas en metodos estadisticos son:
+-Imputacion por media o mediana: Consiste en reemplazar los valores faltantes por la media o la mediana de la variable. La mediana suele ser mas robusta frente a valores atipicos.
+- Imputacion por mode: Se utiliza principalmente para variables categoricas, reemplazando los valores faltantes por el valor mas frecuented ela columna
+
 4. *¿Por favor, describe al menos dos técnicas de imputación de datos para valores faltantes basadas en métodos predictivos?*
+
+Dos tecnicas de imputacion basadas en modelos predictivos
+- Imputacion mediante regresion: se entrena un modelo predictivo utilizando las variables disponibles para estimar los valores faltantes de una variable objetivo
+- Imputacion K-Nearest Neighbors (KNN Imputation): Los valores faltantes se imputan utilizando el promedio o valor mas comun de los k vecinos mas cercanos, considerando la similitud entre registros.
 
 ## Eliminación de Duplicados
 
@@ -689,10 +894,17 @@ Para realizar el análisis de patrones anómalos, utilizarás la función `plot_
 """
 
 #Write your code here
+df_retailbank.drop_duplicates(inplace=True)
+df_investment.drop_duplicates(inplace=True)
+df_insurance.drop_duplicates(inplace=True)
+
 
 """## Pregunta
 
 *¿Por qué es importante llevar a cabo la tarea de eliminación de duplicados? Por favor, justifica tu respuesta.*
+
+La eliminacion de datos duplicados es fundamenta para garantizar la calidad y la consistencia del conjunto de datos. Los duplicados pueden generar sesgos en el analisis, inflar artificialmente la importancia de ciertos registros y afectar negativamente el rendimiento de los modelos de machine learning.
+Ademas, pueden distorsionar metricas estadisticas, provocar sobreajuste y llevar a conclusiones incorrectal. Al eliminar duplicados, se asegura que cada observacion represente una entidad unica, mejorando la fiabilidad de los resultados y la capacidad de generalizacion del modelo.
 
 # Ingeniería de características
 
@@ -842,15 +1054,24 @@ class OutlierRemover(BaseEstimator, TransformerMixin):
 """*Ejecuta la transformación utilizando la clase `OutlierRemover` y asigna el resultado a `df_insurance`*"""
 
 #Write your code here
+outlier_remover = OutlierRemover(threshold=1.5, columns=["Idade","Renda"])
+df_insurance = outlier_remover.fit_transform(df_insurance)
+df_insurance.head()
 
 """## Pregunta
 Después de eliminar los datos atípicos, ¿cuántos registros tiene ahora el DataFrame `df_insurance`?
 """
 
 #Write your code here
+print("Numero de registros en df_insurance despues de eliminar outliers:",df_insurance.shape[0])
 
 """## Pregunta
 *Explica con tus propias palabras cómo podría afectar una diferencia significativa en el tamaño del conjunto de datos antes y después de eliminar los valores atípicos. ¿Qué implicaciones podría tener esto en los resultados de un modelo de machine learning?*
+
+Despues de eliminar los datos atipicos, el tamaño del conjunto de datos se reduce, ya que se descartan aquellas observaciones que estan fuera del rango definido por el criterio de outliers. Si al reduccion es moderada, esto puede ayudar a mejorar la calidad del modelo,
+reduciendo el ruido y evitando que valores extremos distorsionen la estimacion de parametros o las fronteras de decision. Sin embargo, si la diferencia entre el tamaño original y el tamaño final es muy grande, existe el riesgo de perder informaicon relevante y de que el modelo deje de 
+representar adecuadamnte la poblacion real. En es ecaso, los modelos de machine learning podrian generalizar peor, estar sesgados hacia un subconjunto muy "limpio" pero poco representativo y mostrar un rendimiento artificialmente bueno en validacion interna pero peor al enfrentarse a datos reales
+
 
 ## Gráficos luego de eliminar datos atípicos
 
@@ -860,13 +1081,30 @@ En las siguientes gráficas, puedes observar las diferencias con respecto a las 
 """
 
 #Write your code here
+plot_boxplot_violinplot(
+    x="Regiao",
+    y="Idade",
+    data_frame=df_insurance
+)
+
 
 """ *Graficar la región(Regiao) en función de los ingresos(Renda), del conjunto de datos `df_insurance`, utilizando la función `plot_boxplot_violinplot`.*"""
 
 #Write your code here, add you plot using ´plot_boxplot_violinplot´
+plot_boxplot_violinplot(
+    x="Regiao",
+    y="Renda",
+    data_frame=df_insurance
+)
+
 
 """## Pregunta
 *¿Cómo crees que la eliminación de datos atípicos ha afectado la distribución y los patrones observados en las gráficas? ¿Qué cambios específicos puedes identificar en los datos después de esta eliminación?*
+
+Después de eliminar los datos atípicos, la distribución de las variables edad e ingresos por región se vuelve más compacta y menos extrema. En los boxplots se observa que los bigotes son más cortos y hay menos puntos
+aislados fuera del rango intercuartílico, lo que indica que se han eliminado registros muy alejados del comportamiento general. En los violin plots, la densidad se concentra más alrededor de los valores centrales y 
+desaparecen las colas muy largas. En conjunto, los patrones son ahora más estables y representativos de la mayoría de los clientes, lo que reduce el impacto de valores extremos en los futuros modelos de machine learning 
+y facilita una interpretación más clara de las diferencias entre regiones.
 
 ## Normalización y Escalado
 ### Estandarización:
@@ -886,36 +1124,50 @@ class DataScaleImputer(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         # Fit the scaler on the specified columns
         self.scaler.fit(X[self.columns])
-        return self  # Return the transformer
+        return self
 
     def transform(self, X):
-        data = X.copy()  # Make a copy of the input DataFrame to avoid modifying the original
+        data = X.copy()  # Make a copy of the input DataFrame
 
-        # Create a ColumnTransformer that will apply StandardScaler only to the specified columns
-        # Write you code here, change None by custom transformer
-        transformer = None
+        # ColumnTransformer applying StandardScaler only to selected columns
+        transformer = ColumnTransformer(
+            transformers=[
+                ('scaler', self.scaler, self.columns)
+            ],
+            remainder='passthrough'
+        )
 
-        # Apply the transformer to the data
+        # Apply transformation
         X_transform = transformer.fit_transform(data)
 
-        # Convert the result to a DataFrame to maintain the column labels
-        X_imputed_df = pd.DataFrame(data=X_transform, columns=self.columns)
+        # Recover column names (scaled columns first, then the rest)
+        new_columns = self.columns + [col for col in data.columns if col not in self.columns]
 
-        # Replace the original columns in 'data' with the scaled columns
-        data[self.columns] = X_imputed_df[self.columns]
+        # Convert back to DataFrame
+        X_imputed_df = pd.DataFrame(X_transform, columns=new_columns)
 
-        return data.dropna()  # Return the transformed DataFrame
+        return X_imputed_df.dropna()
+
 
 """*Ejecuta la transformación utilizando la clase `DataScaleImputer` y asigna el resultado a `df_insurance`*"""
 
 # Write you code here
+scaler = DataScaleImputer(columns=["Idade", "Renda"])
+df_insurance = scaler.fit_transform(df_insurance)
+df_insurance.head()
+
 
 """*Imprime las estadísticas básicas del conjunto de datos df_insurance, ubásicas utilizando el método `describe()`*"""
 
 # Write you code here
+df_insurance.describe()
+
 
 """## Pregunta
 *¿Cuáles otras técnicas conoces que pueden ser utilizadas para escalar o normalizar los datos? Menciona dos.*
+
+Además de la estandarización mediante StandardScaler, existen otras técnicas comunes para escalar o normalizar datos. Una de ellas es Min-Max Scaling, que transforma los valores para que se encuentren dentro de un rango específico, generalmente entre 0 y 1, siendo útil cuando se desea preservar la forma de la distribución original. 
+Otra técnica es RobustScaler, que utiliza la mediana y el rango intercuartílico en lugar de la media y la desviación estándar, lo que lo hace menos sensible a la presencia de valores atípicos. Ambas técnicas son especialmente útiles dependiendo de la naturaleza de los datos y del algoritmo de machine learning que se vaya a utilizar.
 
 ## Unificación de conjuntos de datos
 
@@ -925,18 +1177,31 @@ Vamos a unificar diferentes conjuntos de datos (`df_insurance`, `df_retailbank` 
 """
 
 # Write you code here
+# Unificamos los tres dataframes usando la clave común 'ID'
+data_frame_merged = df_insurance.merge(df_retailbank, on="ID", how="inner") \
+                                .merge(df_investment, on="ID", how="inner")
+
+# Mostramos los primeros 10 registros
+data_frame_merged.head(10)
+
 
 """*Imprime la cantidad total de registros después de realizar el merge entre los conjuntos de datos.*"""
 
 # Write you code here
+print("Cantidad total de registros después del merge:", data_frame_merged.shape[0])
+
 
 """*Observamos una visión estadística rápida de los datos mediante la función `describe`.*"""
 
 # Write you code here
+data_frame_merged.describe()
+
 
 """*Verifica si hay datos faltantes en el DataFrame resultante.*"""
 
 # Write you code here
+print("Valores faltantes por columna en data_frame_merged:")
+print(data_frame_merged.isna().sum())
 
 """# Correcion nombres columnas
 
@@ -1191,6 +1456,7 @@ tipo_financiamiento_mapping
 """*Imprime las estadísticas básicas del conjunto de datos `data_frame_tipo_financiamiento`*"""
 
 # Write you code here
+data_frame_tipo_financiamiento.describe()
 
 """## Cierre tratamiento de datos
 Es crucial comprender que el tratamiento de datos no es solo una etapa preliminar, sino un proceso continuo que puede influir significativamente en el rendimiento y la precisión de los modelos de Machine Learning. Al abordar de manera efectiva problemas como valores faltantes, valores atípicos y errores de formato, estamos creando un conjunto de datos robusto y confiable, lo que a su vez potencia la capacidad predictiva de nuestros modelos.
@@ -1201,6 +1467,7 @@ Hasta este punto, hemos completado varios pasos relacionados con el tratamiento 
 """
 
 # Write you code here
+data_frame_tipo_financiamiento.to_csv("predicciones.csv",index=False)
 
 """# **Pregunta 3 - Creación de modelos de Machine Learning**
 
@@ -1216,11 +1483,33 @@ Utiliza técnicas de validación cruzada para obtener estimaciones más robustas
 
 ## Pregunta
 *¿Cuál es el tipo de problema que estás enfrentando: clasificación o regresión? Imprime o grafica el conteo de valores que corresponde a la columna `data_frame_tipo_financiamiento`.*
+
+El problema que nos enfrentamos es un problema de clasificacion, ya que la variable objetivo "tipo_financiamineto" representa categorias discretas (por ejemplo, casa, carro, ambos o ninguno) y el objetivo de los modelos es asignar a cada cliente uno de esos tipos de financiamiento.
 """
 
 # Write you code here
 
+conteo = data_frame_tipo_financiamiento["tipo_financiamiento"].value_counts()
+print("Conteo de valores de la variable objetivo (codificada):")
+print(conteo)
+
+# Si quieres verlo con las etiquetas originales:
+conteo_etiquetas = conteo.rename(index=tipo_financiamiento_mapping)
+print("\nConteo de valores de la variable objetivo (con etiquetas):")
+print(conteo_etiquetas)
+
+
 # Write you code here, add your custom plot
+
+plt.figure(figsize=(6,4))
+conteo_etiquetas.plot(kind="bar")
+plt.title("Distribución de tipo_financiamiento")
+plt.xlabel("Tipo de financiamiento")
+plt.ylabel("Cantidad de clientes")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
 
 """## Pasos para el entrenamiento de modelos
 
@@ -1242,32 +1531,54 @@ A continuación, desarrolla los siguientes pasos para cada uno de los modelos so
 # Replace 'data_frame_tipo_financiamiento' and 'tipo_financiamiento' with your actual DataFrame and column names
 # Write you code here
 
+X = data_frame_tipo_financiamiento.drop(columns=['tipo_financiamiento'])  # Features
+y = data_frame_tipo_financiamiento['tipo_financiamiento']  # Target variable
+
+
 # Split the data into training and testing sets using startified_train_test_split
 # You can adjust the test_size parameter as needed
 # 'random_state' ensures reproducibility of results
 # Write you code here
+X_train, X_test, y_train, y_test = startified_train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
 
 # Create the custom model
 # You can customize the parameters based on your requirements
 # Write you code here
+rf_model = RandomForestClassifier(
+    n_estimators=200,
+    max_depth=None,
+    random_state=42,
+    n_jobs=-1
+)
 
 # Train the model on the training data
 # Write you code here
+rf_model.fit(X_train, y_train)
 
 # Make predictions on the testing data
 # Write you code here
+y_pred = rf_model.predict(X_test)
 
 """### **Evaluación del modelo - (Nombre Modelo)**"""
 
 # Evaluate accuracy the model
 # Write you code here
+accuracy_rf = accuracy_score(y_test, y_pred)
+print("Accuracy RandomForest:", accuracy_rf)
 
 # Plot accuracy the model over the time - use plot_accuracy_scores
 #plot_accuracy_scores(rf_model,X_train,y_train,X_test,y_test,nparts=5,jobs=2)
+plot_accuracy_scores(rf_model, X_train, y_train, X_test, y_test, nparts=5, jobs=2)
 
 # Print classifitacion report using classification_report
+clas_report_rf = classification_report(y_test, y_pred, labels=np.unique(y_pred), digits=6)
+print(clas_report_rf)
 
 # Plot confusion matrix using plot_confusion_matrix
+cm_rf = confusion_matrix(y_test, y_pred)
+plot_confusion_matrix(cm_rf, tipo_financiamiento_mapping, title="Matriz de confusión - RandomForest")
 
 """### **Pasos para el entrenamiento del modelo  a comparar - (LogisticRegression)**"""
 
@@ -1315,7 +1626,23 @@ plot_confusion_matrix(confusion_matrix(y_test, y_pred),tipo_financiamiento_mappi
 
 """## Preguntas
 * *¿Puedes comparar los modelos y determinar cuál de ellos tiene un mejor rendimiento en términos de exactitud?*
+
+Para comparar los modelos, hay que fijarse principalmente en:
+- el valor de accuracy que se imprime para cada modelo (por ejemplo: accuracy: para logisticRegression y accuracy RandomForest: para RandomForest)
+-De forma mas completa, revisar tambien el classification_reportprecision, recall y f1-score por clase).
+
+Si el accuracy del RandomForest es mayor al de LogisticRegression, podemos decir que, el RandomForest tiene mejor rendimiento. Sin embargo, incluso si la exactitud es similar, puede que uno de los modelos tenga mejor comportamiento en clases minoritarias (por ejemplo, "Ambos" o "Ninguno"), lo cual
+se ve mejor ene l F1-score por clase.
+
 * *¿Logran los modelos etiquetar todas las clases de forma precisa? ¿Qué estrategias podrían aplicarse para mejorar este aspecto?*
+
+Es muy probable que los modelos no etiquetes todas las clases con la misma precision, sobre todo si hay debalance de clases (por ejemplo, muchas observaciones de "Ninguno" y pocas de "Ambos"). En el classification_report veras que algunas clases tienen menor recall o F1-score.
+
+Algunas estrategias para mejoerar:
+- Tratar el desbalance de clases
+-Elegir metricas adecuadas
+-Ajustar hiperparametros
+-Modificar umbrales de precision
 
 ## Extracción de características y Análisis de Componentes Principales(PCA)
 
@@ -1325,14 +1652,20 @@ Ahora vamos a desarrollar validaciones para ver cuáles características son má
 """
 
 def plot_correlations(df_temp):
-    #Write your code here
-    pass
+    corr = df_temp.corr()
+    plt.figure(figsize=(12,10))
+    sns.heatmap(corr,cmap="coolwarm",center=0)
+    plt.title("Matriz de correlacion")
+    plt.show()
 
 #Write your code here, plot using plot_correlations
 plot_correlations(data_frame_tipo_financiamiento)
 
 """## Pregunta
 * *¿Puedes identificar cuáles columnas son más relevantes y por qué?*
+Las columnas más relevantes son aquellas que presentan mayor correlación absoluta con la variable objetivo tipo_financiamiento.
+ En general, destacan variables relacionadas con el perfil económico y demográfico del cliente, como los rangos de edad (AGE_RANGE) y de ingresos (INCOME_RANGE), así como variables directamente asociadas al comportamiento financiero. 
+ Estas variables aportan mayor información discriminativa para diferenciar entre los distintos tipos de financiamiento.
 
 La siguiente función, `get_most_important_features`, nos permite extraer aquellas n columnas más relevantes a partir de la matriz de correlación.
 """
@@ -1365,11 +1698,21 @@ def get_most_important_features(correlation_matrix, target_column, n=5):
 """
 
 #Write your code here
+corr_matrix = data_frame_tipo_financiamiento.corr()
+top_features = get_most_important_features(
+    corr_matrix,
+    target_column="tipo_financiamiento",
+    n=6
+)
+print("Top 6 características más relevantes:", top_features)
+
 
 """# Análisis de Componentes Principales(PCA)
 
 ## Pregunta
 *¿Qué es el análisis de componentes principales y cuál es su utilidad al implementar modelos de machine learning?*
+El Análisis de Componentes Principales (PCA) es una técnica de reducción de dimensionalidad que transforma un conjunto de variables posiblemente correlacionadas en un número menor de componentes no correlacionados, llamados componentes principales. 
+Su utilidad en machine learning radica en reducir la complejidad del modelo, eliminar redundancia entre variables, disminuir el ruido y mejorar la eficiencia computacional, manteniendo la mayor parte de la varianza de los datos originales.
 
 *Modifica la función `create_pca_model`. Los parámetros de entrada son el conjunto de datos sin la variable a predecir. Se creará un modelo de Análisis de Componentes Principales (PCA), el cual tendrá como parámetro el número N de componentes a identificar. El resultado será el modelo exportado y la transformación hacia las componentes principales luego de evaluar el modelo.*
 
@@ -1394,11 +1737,15 @@ def create_pca_model(X_train, n_components):
     """
     # Instantiate PCA
     #Write your code here
-    pca_model = None
+    pca_model = PCA(n_components=n_components,random_state=42)
 
     # Fit PCA to the training data and transform features
+    principal_components = pca_model.fit_transform(X_train)
     #Write your code here
-    X_principal = None
+    X_principal = pd.DataFrame(
+        principal_components,
+        columns=[f"PC{i+1}" for i in range(n_components)]
+    )
 
     # Return pca_model,X_principal
     return pca_model,X_principal
@@ -1416,6 +1763,9 @@ df_pca_components
 """## Pregunta
 *Compara las variables obtenidas después de realizar el PCA en el conjunto de datos con las variables identificadas a través de la matriz de confusión. ¿Has encontrado coincidencias entre las variables y qué conclusiones puedes extraer de esto?*
 
+Al comparar las variables más relevantes obtenidas mediante la matriz de correlación con las que más contribuyen a las primeras componentes principales del PCA, se observan coincidencias importantes. Esto indica que las variables con mayor correlación con la variable objetivo también explican una parte significativa de la varianza total del conjunto de datos. 
+Esta coincidencia refuerza la idea de que dichas variables contienen la información más relevante para los modelos de clasificación.
+
 Vamos a graficar la curva conocida como codo (elbow curve) utilizando la función `plot_elbow_curve_pca`.
 """
 
@@ -1423,6 +1773,9 @@ plot_elbow_curve_pca(X_principal)
 
 """## Pregunta
 *Primero, investiga para qué sirve la curva conocida como codo (elbow curve). Luego, responde a la pregunta: ¿Cuántos componentes principales (columnas) puedes sugerir que sean utilizados por algún modelo de Machine Learning?*
+
+La curva del codo (elbow curve) se utiliza para identificar el número óptimo de componentes principales a conservar, observando el punto a partir del cual la ganancia de varianza explicada comienza a disminuir de forma marginal. 
+En este caso, se sugiere utilizar 2 componentes principales, ya que a partir de ese punto el incremento en la varianza explicada es menor, logrando un buen equilibrio entre simplicidad y conservación de información.
 
 *Establece el valor para la variable `n_components_pca`, luego ejecuta el modelo de aprendizaje, que incluye una tarea de reducción de la dimensionalidad mediante PCA (Análisis de Componentes Principales).*
 """
@@ -1517,6 +1870,14 @@ X_reshaped, y_reshaped = pipeline_fix_imbalance.fit_resample(X, y)
 """*Implementa un gráfico tipo pie que muestre cómo lucen los datos después de realizar el tratamiento para abordar el desbalance.*"""
 
 #Write your code here
+conteo_tipo_financiamiento_label = y_reshaped.value_counts().rename(index=tipo_financiamiento_mapping)
+conteo_tipo_financiamiento_label.plot.pie(autopct="%1.1f%%")
+plt.ylabel("")
+plt.title("Distribución de clases después del balanceo")
+plt.show()
+
+print(y_reshaped.value_counts())
+
 #conteo_tipo_financiamiento_label = y_reshaped.value_counts().rename(index=tipo_financiamiento_mapping)
 #conteo_tipo_financiamiento_label.plot.pie()
 #y_reshaped.value_counts()
@@ -1554,6 +1915,10 @@ GradientBoostingClassifier(
 # Split the data into training and testing sets with stratification
 # Stratification ensures that the class distribution is preserved in both training and testing sets
 # Write your code here
+X_train, X_test, y_train, y_test = startified_train_test_split(
+    X_reshaped, y_reshaped, test_size=0.2, random_state=42
+)
+
 
 
 # Define the steps for the pipeline
@@ -1585,12 +1950,15 @@ steps_gradient_boost = [
 
 # Create the pipeline for Gradient Boosting
 # Write your code here
+pipeline_gradient_boost = Pipeline(steps_gradient_boost)
 
 # Train the model using fit
 # Write your code here
+pipeline_gradient_boost.fit(X_train, y_train)
 
 # Make predictions
 # Write your code here
+y_pred = pipeline_gradient_boost.predict(X_test)
 
 """Evaluemos los resultados del modelo."""
 
@@ -1603,8 +1971,39 @@ plot_confusion_matrix(confusion_matrix(y_test, y_pred),tipo_financiamiento_mappi
 
 """# Pregunta 4
 * *¿Cuál de los modelos consideras que es más eficiente en términos de rendimiento y por qué?*
+El modelo más eficiente es aquel que logra un mejor equilibrio entre exactitud global y desempeño por clase. En general, los modelos basados en árboles y ensambles, como Gradient Boosting, tienden a superar a modelos lineales cuando existen relaciones no lineales y datos desbalanceados, mostrando mejores valores de F1-score y recall en clases minoritarias.
+
 * *Luego de evaluar los diferentes modelos, como científico de datos, ¿cuál sugerirías implementar y por qué? Justifica tu respuesta.*
+Sugeriría implementar el modelo de Gradient Boosting con tratamiento de desbalance, ya que combina un buen rendimiento predictivo con una mejor capacidad para generalizar en todas las clases. Además, es menos sensible al ruido y permite ajustar hiperparámetros para optimizar el compromiso entre sesgo y varianza.
+
 * *Investiga qué otras opciones pueden ser utilizadas para enfrentar el problema de datos desbalanceados e implementa un ejemplo.*
+Además de SMOTE y undersampling, se pueden usar:
+ADASYN
+class_weight="balanced"
+
+rf_balanced = RandomForestClassifier(
+    n_estimators=200,
+    class_weight="balanced",
+    random_state=42
+)
+rf_balanced.fit(X_train, y_train)
+
+BalancedRandomForest
 * *Investiga qué son los modelos de ensamble e implementa un corto ejemplo.*
+Los modelos de ensamble combinan múltiples modelos base para mejorar la robustez y el rendimiento predictivo. Al agregar distintos modelos, se reduce el error individual y se obtiene una predicción más estable.
+
+ensemble = VotingClassifier(
+    estimators=[
+        ('lr', LogisticRegression(max_iter=1000)),
+        ('rf', RandomForestClassifier(random_state=42)),
+        ('gb', GradientBoostingClassifier(random_state=42))
+    ],
+    voting='hard'
+)
+
+ensemble.fit(X_train, y_train)
+y_pred_ens = ensemble.predict(X_test)
+print(classification_report(y_test, y_pred_ens))
+
 
 """
